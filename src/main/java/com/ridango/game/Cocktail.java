@@ -8,7 +8,7 @@ public class Cocktail {
     private String ingredients;
     private String imageUrl;
 
-    // Constructor
+
     public Cocktail(String name, String instructions, String category, String glass, String ingredients, String imageUrl) {
         this.name = name;
         this.instructions = instructions;

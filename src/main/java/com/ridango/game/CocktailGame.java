@@ -20,7 +20,7 @@ public class CocktailGame {
         boolean playAgain = true;
 
         while (playAgain) {
-            currentScore = 0; // Reset current score for each game session
+            currentScore = 0; // to reset score
             playGame(scanner);
             System.out.println("Game over! Your final score is: " + highScore);
 //            System.out.println("Highest score: " + highScore);
@@ -37,7 +37,7 @@ public class CocktailGame {
         boolean guessedCorrectly;
 
         while (true) {
-            attempts = 5; // Reset attempts for each new cocktail
+            attempts = 5; // to reset attempts
             guessedCorrectly = false;
 
             Cocktail cocktail = cocktailService.fetchRandomCocktail();
@@ -77,10 +77,10 @@ public class CocktailGame {
             if (!guessedCorrectly && attempts == 0) {
                 System.out.println("You've used all attempts. The cocktail was: " + cocktail.getName());
                 if (currentScore > highScore) {
-                    highScore = currentScore; // Update high score if current score is higher
+                    highScore = currentScore;
                 }
-                currentScore = 0; // Reset score after game over
-                break; // End the game session
+                currentScore = 0;
+                break; // To end the game
             }
         }
     }
