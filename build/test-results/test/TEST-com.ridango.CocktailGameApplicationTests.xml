@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ridango.CocktailGameApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-09-19T12:22:46" hostname="DESKTOP-OGSQ6J9" time="0.473">
+  <properties/>
+  <testcase name="testNoAttemptsLeft()" classname="com.ridango.CocktailGameApplicationTests" time="0.473"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

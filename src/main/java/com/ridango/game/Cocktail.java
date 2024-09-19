@@ -23,13 +23,9 @@ public class Cocktail {
         return name;
     }
 
-    public String getInstructions() {
-        return instructions;
-    }
+    public String getInstructions() { return instructions; }
 
-    public String getCategory() {
-        return category;
-    }
+    public String getCategory() { return category; }
 
     public String getGlass() {
         return glass;

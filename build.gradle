@@ -22,7 +22,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web',
 			'org.springframework.boot:spring-boot-starter-data-jpa',
 			'org.projectlombok:lombok',
-			'com.google.code.gson:gson:2.8.8'
+			'com.google.code.gson:gson:2.8.8',
+			'org.projectlombok:lombok:1.18.24'
+
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

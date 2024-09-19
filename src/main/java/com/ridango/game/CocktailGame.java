@@ -1,18 +1,28 @@
 package com.ridango.game;
 
-import java.util.HashSet;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 public class CocktailGame {
-    private int highScore = 0;
-    private int currentScore = 0;
-    private Set<String> usedCocktails = new HashSet<>();
+    private CocktailGameManager gameManager;
     private CocktailService cocktailService;
 
     public CocktailGame() {
         this.cocktailService = new CocktailService();
+        List<Cocktail> cocktails = fetchCocktailsForGame();
+        this.gameManager = new CocktailGameManager(cocktails);
+    }
+
+    private List<Cocktail> fetchCocktailsForGame() {
+        List<Cocktail> cocktails = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Cocktail cocktail = cocktailService.fetchRandomCocktail();
+            if (cocktail != null) {
+                cocktails.add(cocktail);
+            }
+        }
+        return cocktails;
     }
 
     public void start() {
@@ -20,11 +30,10 @@ public class CocktailGame {
         boolean playAgain = true;
 
         while (playAgain) {
-            currentScore = 0; // to reset score
+            gameManager.resetForNextRound();
             playGame(scanner);
-            System.out.println("Game over! Your final score is: " + highScore);
-//            System.out.println("Highest score: " + highScore);
 
+            System.out.println("Game over! Your final score is: " + gameManager.getHighScore());
             System.out.print("Do you want to play again? (yes/no): ");
             playAgain = scanner.nextLine().equalsIgnoreCase("yes");
         }
@@ -33,73 +42,49 @@ public class CocktailGame {
     }
 
     private void playGame(Scanner scanner) {
-        int attempts;
         boolean guessedCorrectly;
-
         while (true) {
-            attempts = 5; // to reset attempts
-            guessedCorrectly = false;
-
-            Cocktail cocktail = cocktailService.fetchRandomCocktail();
+            Cocktail cocktail = gameManager.getNextCocktail();
             if (cocktail == null) {
-                System.out.println("Error fetching cocktail data. Please try again.");
-                return;
+                System.out.println("No more cocktails available.");
+                break;
             }
-
-            while (usedCocktails.contains(cocktail.getName())) {
-                cocktail = cocktailService.fetchRandomCocktail();
-            }
-            usedCocktails.add(cocktail.getName());
 
             String hiddenName = cocktail.getName().replaceAll("[a-zA-Z]", "_");
             System.out.println("Guess the cocktail: " + hiddenName);
             System.out.println("Instructions: " + cocktail.getInstructions());
 
-            while (attempts > 0 && !guessedCorrectly) {
+            guessedCorrectly = false;
+            while (true) {
                 System.out.print("Enter your guess: ");
                 String guess = scanner.nextLine();
 
-                if (guess.equalsIgnoreCase(cocktail.getName())) {
-                    guessedCorrectly = true;
-                    currentScore += attempts;
-                    System.out.println("Correct! Your score is now: " + currentScore);
-                    System.out.println("Attempts left: " + attempts); // Show attempts left
-                    break; // Exit the loop to start a new cocktail
+                CocktailGameManager.GameState gameState = gameManager.takeGuess(guess);
+                guessedCorrectly = gameState.isCorrect();
+
+                if (guessedCorrectly) {
+                    System.out.println("Correct! Your score is now: " + gameState.getCurrentScore());
+                    break;
                 } else {
-                    attempts--;
-                    hiddenName = revealLetters(hiddenName, cocktail.getName(), 1);
-                    System.out.println("Wrong guess. Attempts left: " + attempts);
+                    hiddenName = gameManager.revealLetters(hiddenName, 1);
+                    System.out.println("Wrong guess. Attempts left: " + gameState.getRemainingAttempts());
                     System.out.println("Revealed letters: " + hiddenName);
                     displayCocktailHints(cocktail);
                 }
-            }
 
-            if (!guessedCorrectly && attempts == 0) {
-                System.out.println("You've used all attempts. The cocktail was: " + cocktail.getName());
-                if (currentScore > highScore) {
-                    highScore = currentScore;
+
+                if (gameState.getRemainingAttempts() <= 0) {
+                    System.out.println("You've used all attempts. The cocktail was: " + cocktail.getName());
+                    gameManager.updateHighScore();
+                    break;
                 }
-                currentScore = 0;
-                break; // To end the game
+            }
+
+            if (!guessedCorrectly) {
+
+                break;
             }
         }
-    }
-
-    private String revealLetters(String hiddenName, String actualName, int lettersToReveal) {
-        char[] hiddenChars = hiddenName.toCharArray();
-        char[] actualChars = actualName.toCharArray();
-        Random random = new Random();
-
-        for (int i = 0; i < lettersToReveal; i++) {
-            int randomIndex;
-            do {
-                randomIndex = random.nextInt(actualName.length());
-            } while (hiddenChars[randomIndex] != '_');
-
-            hiddenChars[randomIndex] = actualChars[randomIndex];
-        }
-
-        return new String(hiddenChars);
     }
 
     private void displayCocktailHints(Cocktail cocktail) {
